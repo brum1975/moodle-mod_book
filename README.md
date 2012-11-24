@@ -26,3 +26,6 @@ Intentionally omitted features:
 * PDF export - there is no elegant way AFAIK to convert HTML to PDF, use virtual PDF printer or better use DocBook format for authoring
 * detailed student tracking (postponed till officially supported)
 * export as zipped set of HTML pages - instead use browser command Save page as... in print view
+
+Modified by:
+* Matthew Cannings - Introduce text based navigational option
