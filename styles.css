@@ -129,3 +129,11 @@
 .navbottom.linkstyle1 a[title="Previous"]{
     display: none;
 }
+/* TOC Only style links */
+
+.navtop.linkstyle2 a[title="Next"],.navtop.linkstyle2 a[title="Previous"], .navtop.linkstyle2 a[title="Exit book"]{
+    display: none;
+}
+.navbottom.linkstyle2 a[title="Next"],.navbottom.linkstyle2 a[title="Previous"]{
+    display: none;
+}

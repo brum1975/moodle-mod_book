@@ -39,17 +39,46 @@ function xmldb_book_upgrade($oldversion) {
 
     // Moodle v2.3.0 release upgrade line
     // Put any upgrade step following this
-    if ($oldversion < 2012112301) {
+    if ($oldversion < 2013012100) {
+    	//create extra table for new settings leaving core alone
+		$table = new xmldb_table('book_extras');
+		
+        // Adding fields to table role_reassign_rules
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('bookid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+        $table->add_field('linkstyle', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table role_reassign_rules
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));	
+			
+       	if (!$dbman->table_exists($table)) {
+           	$dbman->create_table($table);
+       	}		
+		
+		
+    	//check for existance of field that was created in previous version that should not :(
         $table = new xmldb_table('book');
         $field = new xmldb_field('linkstyle', XMLDB_TYPE_INTEGER, '4' , XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
 
-        // Conditionally launch add field approvaldisplayformat
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+        // Conditionally launch field migration
+		if ($dbman->field_exists($table, $field)) {
+			//move values to the new table
+			$sql = "SELECT id, linkstyle FROM {book}";
+			$rs = $DB->get_recordset_sql($sql);
+			foreach($rs as $res) {
+				$extra = new stdClass();
+				$extra->bookid = $res->id;
+				$extra->linkstyle = $res->linkstyle;
+				$extra_update = $DB->insert_record('book_extras', $extra);			
+			}
+			$rs->close();
+			//remove the bad field
+            $dbman->drop_field($table, $field);
         }
 
+
         // book savepoint reached
-        upgrade_mod_savepoint(true, 2012112301, 'book');
+        upgrade_mod_savepoint(true, 2013012100, 'book');
     }
 
     return true;

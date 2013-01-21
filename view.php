@@ -38,13 +38,18 @@ if ($id) {
     $cm = get_coursemodule_from_id('book', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
     $book = $DB->get_record('book', array('id'=>$cm->instance), '*', MUST_EXIST);
+	$bookextras = $DB->get_record('book_extras', array('bookid'=>$book->id), '*', IGNORE_MISSING);
 } else {
     $book = $DB->get_record('book', array('id'=>$bid), '*', MUST_EXIST);
+	$bookextras = $DB->get_record('book_extras', array('bookid'=>$book->id), '*', IGNORE_MISSING);
     $cm = get_coursemodule_from_instance('book', $book->id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
     $id = $cm->id;
 }
-
+if(!$bookextras){
+	$bookextras = new stdClass();
+	$bookextras->linkstyle = 0;
+}
 require_course_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
@@ -144,7 +149,7 @@ foreach ($chapters as $ch) {
 
 $chnavigation = '';
 if ($previd) {
-    if ($book->linkstyle == 0){
+    if ($bookextras->linkstyle == 0){
         $chnavigation .= '<a title="'.get_string('navprev', 'book').'" href="view.php?id='.$cm->id.
             '&amp;chapterid='.$previd.'"><img src="'.$OUTPUT->pix_url('nav_prev', 'mod_book').'" class="bigicon" alt="'.get_string('navprev', 'book').'"/></a>';
     } else {
@@ -153,13 +158,13 @@ if ($previd) {
     }
 
 } else {
-    if ($book->linkstyle == 0){
+    if ($bookextras->linkstyle == 0){
         $chnavigation .= '<img src="'.$OUTPUT->pix_url('nav_prev_dis', 'mod_book').'" class="bigicon" alt="" />';
     }
 }
 $chnavigation .= '&nbsp;';
 if ($nextid) {
-    if ($book->linkstyle == 0){
+    if ($bookextras->linkstyle == 0){
         $chnavigation .= '<a title="'.get_string('navnext', 'book').'" href="view.php?id='.$cm->id.
             '&amp;chapterid='.$nextid.'"><img src="'.$OUTPUT->pix_url('nav_next', 'mod_book').'" class="bigicon" alt="'.get_string('navnext', 'book').'" /></a>';
     } else {
@@ -177,7 +182,7 @@ if ($nextid) {
     } else {
         $returnurl = "$CFG->wwwroot/course/view.php?id=$course->id#section-$sec";
     }
-    if ($book->linkstyle == 0){
+    if ($bookextras->linkstyle == 0){
         $chnavigation .= '<a title="'.get_string('navexit', 'book').'" href="'.$returnurl.'"><img src="'.$OUTPUT->pix_url('nav_exit', 'mod_book').
                 '" class="bigicon" alt="'.get_string('navexit', 'book').'" /></a>';
     } else {
@@ -196,7 +201,7 @@ if ($nextid) {
 echo $OUTPUT->header();
 
 // upper nav
-echo '<div class="navtop linkstyle'.$book->linkstyle.'">'.$chnavigation.'</div>';
+echo '<div class="navtop linkstyle'.$bookextras->linkstyle.'">'.$chnavigation.'</div>';
 
 // chapter itself
 echo $OUTPUT->box_start('generalbox book_content');
@@ -217,6 +222,6 @@ echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, '
 echo $OUTPUT->box_end();
 
 // lower navigation
-echo '<div class="navbottom linkstyle'.$book->linkstyle.'">'.$chnavigation.'</div>';
+echo '<div class="navbottom linkstyle'.$bookextras->linkstyle.'">'.$chnavigation.'</div>';
 
 echo $OUTPUT->footer();

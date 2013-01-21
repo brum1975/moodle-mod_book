@@ -49,6 +49,7 @@ function book_get_link_types() {
     return array (
         BOOK_LINK_IMAGE     => get_string('linkstyle0', 'mod_book'),
         BOOK_LINK_TEXT      => get_string('linkstyle1', 'mod_book'),
+        BOOK_LINK_TOC		=> get_string('linkstyle2', 'mod_book')
     );
 }
 
@@ -76,8 +77,12 @@ function book_add_instance($data, $mform) {
     if (!isset($data->customtitles)) {
         $data->customtitles = 0;
     }
-
-    return $DB->insert_record('book', $data);
+	$data2 = new stdClass();
+	$data2->linkstyle = $data->linkstyle;
+    $result = $DB->insert_record('book', $data);
+	$data2->bookid = $result;
+    $DB->insert_record('book_extras', $data2);
+    return $result;
 }
 
 /**
@@ -95,7 +100,18 @@ function book_update_instance($data, $mform) {
     if (!isset($data->customtitles)) {
         $data->customtitles = 0;
     }
+	$data2 = new stdClass();
+	$data2->bookid = $data->id;
+	$data2->linkstyle = $data->linkstyle;
+	$book_extra = $DB->get_record('book_extras', array('bookid'=>$data->id));
+	if ($book_extra){//if already has an extra field
+		$data2->id = $book_extra->id;
+		$DB->update_record('book_extras', $data2);
+	} else {
+		$DB->insert_record('book_extras', $data2);
+	}
 
+	
     $DB->update_record('book', $data);
 
     $book = $DB->get_record('book', array('id'=>$data->id));
@@ -118,6 +134,7 @@ function book_delete_instance($id) {
     }
 
     $DB->delete_records('book_chapters', array('bookid'=>$book->id));
+	$DB->delete_records('book_extras', array('bookid'=>$book->id));
     $DB->delete_records('book', array('id'=>$book->id));
 
     return true;

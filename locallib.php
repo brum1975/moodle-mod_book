@@ -41,6 +41,7 @@ define('BOOK_NUM_INDENTED', '3');
 
 define ('BOOK_LINK_IMAGE', '0');
 define ('BOOK_LINK_TEXT', '1');
+define ('BOOK_LINK_TOC', '2');
 /**
  * Preload book chapters and fix toc structure if necessary.
  *

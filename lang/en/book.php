@@ -64,6 +64,7 @@ $string['linkstyle_help'] = '* Images - Icons are used for navigation
 * Text - Chapter titles are used for navigation';
 $string['linkstyle0'] = 'Images';
 $string['linkstyle1'] = 'Text';
+$string['linkstyle2'] = 'TOC Only (No links)';
 $string['linkoptions'] ='Available options for navigational links';
 $string['linkoptions_desc'] = 'Options for displaying navigation on the book pages';
 $string['addafter'] = 'Add new chapter';

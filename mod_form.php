@@ -30,12 +30,12 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_book_mod_form extends moodleform_mod {
 
     function definition() {
-        global $CFG;
+        global $CFG, $DB;
 
         $mform = $this->_form;
 
         $config = get_config('book');
-
+		
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
@@ -76,6 +76,13 @@ class mod_book_mod_form extends moodleform_mod {
             }
         }
         if ($this->current->instance) {
+			$thisstyle = $DB->get_record('book_extras', array('bookid'=>$this->current->id));
+			if ($thisstyle){
+				$this->current->linkstyle = $thisstyle->linkstyle;
+			} else {
+				$this->current->linkstyle = $config->linkstyle;
+			}
+			
             if (!isset($options2[$this->current->linkstyle])) {
                 if (isset($alloptions2[$this->current->linkstyle])) {
                     $options2[$this->current->linkstyle] = $alloptions2[$this->current->linkstyle];
