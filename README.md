@@ -29,4 +29,5 @@ Intentionally omitted features:
 
 Modified by:
 * Matthew Cannings - Introduce text based navigational option
-* Creates extra table so can be swapped with core, just remove table book_extras to revert back
+
+NOTE: Creates extra table so can be swapped with core, just remove table book_extras to revert back
